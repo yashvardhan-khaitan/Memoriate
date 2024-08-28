@@ -1,4 +1,5 @@
 import os
+import weaviate
 
 from dotenv import load_dotenv
 from discord.ext import commands
@@ -15,6 +16,9 @@ async def on_ready():
 
 @bot.command(name='add-story')
 async def addStory(ctx):
+    # send story to weaviate db
+
+    # depending on success, send inserted/not inserted message
     await ctx.send("Greatness from small beginnings")
 
 bot.run(TOKEN)
