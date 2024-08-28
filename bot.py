@@ -1,15 +1,20 @@
 import os
 
-import discord
 from dotenv import load_dotenv
+from discord.ext import commands
+import discord
 
 load_dotenv()
 TOKEN = os.getenv('DISCORD_TOKEN')
 
-client = discord.Client(intents=discord.Intents.default())
+bot = commands.Bot(command_prefix='/', intents=discord.Intents.all())
 
-@client.event
+@bot.event
 async def on_ready():
-    print(f'{client.user} has connected to Discord!')
+    print("online")
 
-client.run(TOKEN)
+@bot.command(name='add-story')
+async def addStory(ctx):
+    await ctx.send("Greatness from small beginnings")
+
+bot.run(TOKEN)
