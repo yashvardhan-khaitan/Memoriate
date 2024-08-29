@@ -6,8 +6,8 @@ import json
 
 #def insertStory(message):
 headers = {
-        "X-OpenAI-Api-Key": os.getenv("OPENAI_APIKEY")
-    }  # Replace with your OpenAI API key
+    "X-OpenAI-Api-Key": os.getenv("OPENAI_APIKEY")
+}
  
 client = weaviate.connect_to_local(headers=headers)
 
