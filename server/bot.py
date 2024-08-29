@@ -17,7 +17,6 @@ async def on_ready():
 
 @bot.command(name='add-story')
 async def addStory(ctx):
-    # send story to weaviate db
     
     # need userID, userName, serverID, serverName, message
     user_id = ctx.author.id
@@ -35,12 +34,15 @@ async def addStory(ctx):
         f'Message ID: {message_id}'
     )
 
+    # send story to weaviate db
     storyDBID = insertStory(message, message_id, user_id, user_name, server_id, server_name)
 
     # depending on success, send inserted/not inserted message
+    
+    # TODO: Catch exceptions/error codes
     if (storyDBID == None):
         await ctx.send("There was an error when adding your story. Please try again!")
     else:
-        await ctx.send("Story added!")
+        await ctx.send(f"Story added! Here is the UUID of the message: {storyDBID}")
 
 bot.run(TOKEN)

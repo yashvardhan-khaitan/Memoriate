@@ -17,11 +17,11 @@ def createDB():
         name="stories",
         properties=[
             wc.Property(name="story", data_type=wc.DataType.TEXT),
-            wc.Property(name="userID", data_type=wc.DataType.TEXT),
+            wc.Property(name="userID", data_type=wc.DataType.INT),
             wc.Property(name="userName", data_type=wc.DataType.TEXT),
-            wc.Property(name="serverID", data_type=wc.DataType.TEXT),
+            wc.Property(name="serverID", data_type=wc.DataType.INT),
             wc.Property(name="serverName", data_type=wc.DataType.TEXT),
-            wc.Property(name="messageID", data_type=wc.DataType.TEXT)
+            wc.Property(name="messageID", data_type=wc.DataType.INT)
         ],
         # Define the vectorizer module
         vectorizer_config=wc.Configure.Vectorizer.text2vec_openai(),
@@ -59,6 +59,7 @@ def queryDB(storyQuery):
 
     client.close()
 
+# Remove when done
 def deleteDB():
 
     client.collections.delete("stories")
