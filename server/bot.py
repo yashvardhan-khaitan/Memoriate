@@ -1,10 +1,8 @@
 import os
-import weaviate
-
 from dotenv import load_dotenv
 from discord.ext import commands
 import discord
-from db import insertStory
+from db import insertStory, summarizeDB
 
 load_dotenv()
 TOKEN = os.getenv('DISCORD_TOKEN')
@@ -38,11 +36,17 @@ async def addStory(ctx):
     storyDBID = insertStory(message, message_id, user_id, user_name, server_id, server_name)
 
     # depending on success, send inserted/not inserted message
-    
+
     # TODO: Catch exceptions/error codes
     if (storyDBID == None):
         await ctx.send("There was an error when adding your story. Please try again!")
     else:
         await ctx.send(f"Story added! Here is the UUID of the message: {storyDBID}")
+
+@bot.command(name='summarize')
+async def summarize(ctx):
+    message = ctx.message.content.replace("/summarize ", '')
+    summary = summarizeDB(message)
+    await ctx.send(summary)
 
 bot.run(TOKEN)
