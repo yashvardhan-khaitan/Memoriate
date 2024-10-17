@@ -23,6 +23,13 @@ async def addStory(ctx):
     server_name = ctx.guild.name if ctx.guild else "Direct Message"
     message_id = ctx.message.id
     message = ctx.message.content.replace("/add-story ", '')
+    images = ctx.message.attachments
+    image_urls = []
+
+    for urls in images:
+        image_urls.append(urls.url)
+
+    print(image_urls)
 
     print(
         f'User ID: {user_id}\n'
@@ -33,7 +40,7 @@ async def addStory(ctx):
     )
 
     # send story to weaviate db
-    storyDBID = insertStory(message, message_id, user_id, user_name, server_id, server_name)
+    storyDBID = insertStory(message, message_id, user_id, user_name, server_id, server_name, image_urls)
 
     # depending on success, send inserted/not inserted message
 

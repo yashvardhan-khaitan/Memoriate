@@ -22,7 +22,8 @@ def createDB():
             wc.Property(name="userName", data_type=wc.DataType.TEXT),
             wc.Property(name="serverID", data_type=wc.DataType.INT, skip_vectorization=True),
             wc.Property(name="serverName", data_type=wc.DataType.TEXT, skip_vectorization=True),
-            wc.Property(name="messageID", data_type=wc.DataType.INT, skip_vectorization=True)
+            wc.Property(name="messageID", data_type=wc.DataType.INT, skip_vectorization=True),
+            wc.Property(name="image_urls", data_type=wc.DataType.TEXT_ARRAY, skip_vectorization=True)
         ],
         # Define the vectorizer module
         vectorizer_config=wc.Configure.Vectorizer.text2vec_openai(),
@@ -32,7 +33,7 @@ def createDB():
 
     client.close()
 
-def insertStory(message, messageID, userID, userName, serverID, serverName):
+def insertStory(message, messageID, userID, userName, serverID, serverName, image_urls):
 
     client = weaviate.connect_to_local(headers=headers)
 
@@ -44,7 +45,8 @@ def insertStory(message, messageID, userID, userName, serverID, serverName):
             "userName": userName,
             "serverID": serverID,
             "serverName": serverName,
-            "messageID": messageID
+            "messageID": messageID,
+            "image_urls": image_urls
         }                 
     )
 
@@ -65,17 +67,22 @@ def summarizeDB(storyQuery):
     # Get stories from Weaviate
     stories = client.collections.get("stories")
     response = stories.generate.near_text(
-        query=storyQuery, 
-        limit=3
+        query=storyQuery
     )
 
+    print(response)
     # Extract user stories
     user_stories = []
     for o in response.objects:
-        user_stories.append(o.properties["story"])
+        if len(o.properties["image_urls"]) != 0:
+            user_stories.append({o.properties["story"]: o.properties["image_urls"]})
+        else:
+            user_stories.append(o.properties["story"])
+
+    print(user_stories)
 
     # Create prompt for summarization and send to Cerebras
-    prompt = f"""Summarize the following stories in a paragraph: {user_stories}"""
+    prompt = f"""Summarize the following stories or image captions and attach any image urls if found: {user_stories}. Remove any irrelevant stories that may not be related to the prompt: {storyQuery}"""
     chat_completion = cerb_client.chat.completions.create(
         messages=[
             {
@@ -83,7 +90,7 @@ def summarizeDB(storyQuery):
                 "content": prompt
             }
         ],
-        model="llama3.1-8b"
+        model="llama3.1-70b"
     )
 
     client.close()
@@ -95,6 +102,3 @@ def deleteDB():
     client = weaviate.connect_to_local(headers=headers)
     client.collections.delete("stories")
     client.close()
-
-# if __name__ == "__main__": 
-#     summarizeDB("How was RAG Night?")
