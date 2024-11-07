@@ -2,12 +2,10 @@ import weaviate
 import weaviate.classes.config as wc
 import os
 import weaviate.classes.query as wq
-import json
 from cerebras.cloud.sdk import Cerebras
 
-#def insertStory(message):
 headers = {
-    "X-OpenAI-Api-Key": os.getenv("OPENAI_APIKEY")
+    "X-OpenAI-Api-Key": os.getenv("OPENAI_API_KEY")
 }
  
 def createDB():
@@ -67,7 +65,8 @@ def summarizeDB(storyQuery):
     # Get stories from Weaviate
     stories = client.collections.get("stories")
     response = stories.generate.near_text(
-        query=storyQuery
+        query=storyQuery,
+        limit=5
     )
 
     print(response)
@@ -82,12 +81,15 @@ def summarizeDB(storyQuery):
     print(user_stories)
 
     # Create prompt for summarization and send to Cerebras
-    prompt = f"""Summarize the following stories or image captions and attach any image urls if found: {user_stories}. Remove any irrelevant stories that may not be related to the prompt: {storyQuery}"""
+    prompt = f"""Summarize the following stories or image captions and attach any image urls if found: {user_stories}. 
+    Remove any irrelevant stories that may not be related to the prompt: {storyQuery}. Only return the summarization along with any image urls. 
+    DO NOT PREFACE YOUR RESPONSE WITH ANYTHING!"""
+
     chat_completion = cerb_client.chat.completions.create(
         messages=[
             {
                 "role": "user",
-                "content": prompt
+                "content": prompt,
             }
         ],
         model="llama3.1-70b"
@@ -102,3 +104,6 @@ def deleteDB():
     client = weaviate.connect_to_local(headers=headers)
     client.collections.delete("stories")
     client.close()
+
+if __name__ == "__main__":
+    summarizeDB("What did we do in Korea?")

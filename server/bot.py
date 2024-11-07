@@ -13,7 +13,7 @@ bot = commands.Bot(command_prefix='/', intents=discord.Intents.all())
 async def on_ready():
     print("online")
 
-@bot.command(name='add-story')
+@bot.command(name='add')
 async def addStory(ctx):
     
     # need userID, userName, serverID, serverName, message
@@ -22,7 +22,7 @@ async def addStory(ctx):
     server_id = ctx.guild.id if ctx.guild else "Direct Message"
     server_name = ctx.guild.name if ctx.guild else "Direct Message"
     message_id = ctx.message.id
-    message = ctx.message.content.replace("/add-story ", '')
+    message = ctx.message.content.replace("/add ", '')
     images = ctx.message.attachments
     image_urls = []
 
@@ -48,7 +48,7 @@ async def addStory(ctx):
     if (storyDBID == None):
         await ctx.send("There was an error when adding your story. Please try again!")
     else:
-        await ctx.send(f"Story added! Here is the UUID of the message: {storyDBID}")
+        await ctx.send(f"Story {storyDBID} added!")
 
 @bot.command(name='summarize')
 async def summarize(ctx):
